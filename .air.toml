@@ -1,0 +1,23 @@
+root = "."
+tmp_dir = "bin"
+
+[build]
+cmd = "go build -o ./bin/main ./cmd/api"
+bin = "bin/main"                     # path to the binary built by cmd
+full_bin = "APP_ENV=dev ./bin/main"  # command to run binary with env vars
+rerun = true                         # rerun binary after each successful build
+exclude_dir = ["bin", "vendor", "frontend/node_modules"]
+exclude_file = []
+exclude_regex = ["_test\\.go"]
+include_ext = ["go", "tpl", "tmpl", "html"]
+poll = true                           # use polling to detect file changes (good for Docker volumes)
+poll_interval = 500                   # check files every 500ms
+delay = 1000                          # delay before next build (ms)
+stop_on_error = true                  # stop running binary if build fails
+
+[log]
+time = true                           # show timestamp in logs
+
+[screen]
+clear_on_rebuild = false              # clear screen on rebuild
+keep_scroll = true                    # keep scrollback after rebuild

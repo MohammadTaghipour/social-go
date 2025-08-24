@@ -1,0 +1,11 @@
+services:
+  app:
+    image: golang:1.25
+    container_name: social_app
+    working_dir: /app
+    volumes:
+      - .:/app
+    ports:
+      - "8080:8080"
+    command: sh -c "go install github.com/air-verse/air@latest && air -c .air.toml"
+    restart: unless-stopped
