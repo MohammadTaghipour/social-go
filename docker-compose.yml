@@ -15,7 +15,7 @@ services:
       - db
 
   db:
-    image: postgres:15
+    image: postgres:16
     container_name: social_db
     environment:
       POSTGRES_USER: admin
@@ -31,9 +31,10 @@ services:
   migrate:
     image: migrate/migrate
     volumes:
-      - ./cmd/migrate/migrations:/migrations   # mount your migration files
+      - ./cmd/migrate/migrations:/migrations
+    entrypoint: [ "migrate", "-path", "/migrations", "-database", "postgres://admin:adminpassword@db/social?sslmode=disable" ]
     depends_on:
-        - db
+      - db
 
 volumes:
   pgdata:
