@@ -134,8 +134,7 @@ func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request
 		post.Tags = *payload.Tags
 	}
 
-	err = app.store.Posts.Update(r.Context(), post)
-	if err != nil {
+	if err := app.store.Posts.Update(r.Context(), post); err != nil {
 		app.statusInternalServerError(w, r, err)
 		return
 	}
