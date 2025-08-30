@@ -1,6 +1,6 @@
 services:
   app:
-    image: golang:1.25
+    build: .
     container_name: social_app
     environment:
       DB_ADDR: "postgres://admin:adminpassword@db/social?sslmode=disable"
@@ -9,13 +9,13 @@ services:
       - .:/app
     ports:
       - "8080:8080"
-    command: sh -c "go install github.com/air-verse/air@latest && air -c .air.toml"
     restart: unless-stopped
     depends_on:
       - db
 
+
   db:
-    image: postgres:16
+    image: postgres:15
     container_name: social_db
     environment:
       POSTGRES_USER: admin
