@@ -42,7 +42,7 @@ func (s *UserStore) GetByID(ctx context.Context, userID int64) (*User, error) {
 	`
 	var user User
 	if err := s.db.QueryRowContext(ctx, query, userID).Scan(
-		&userID,
+		&user.ID,
 		&user.Username,
 		&user.Email,
 		&user.CreatedAt,
