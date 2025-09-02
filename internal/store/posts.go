@@ -15,9 +15,15 @@ type Post struct {
 	UserID    int64     `json:"user_id"`
 	Tags      []string  `json:"tags"`
 	Comments  []Comment `json:"comments"`
+	User      User      `json:"user"`
 	CreatedAt string    `json:"created_at"`
 	Version   int       `json:"version"`
 	UpdatedAt string    `json:"updated_at"`
+}
+
+type PostWithMetadata struct {
+	Post         `json:"post"`
+	CommentCount int `json:"comments_count"`
 }
 
 type PostStore struct {
@@ -119,4 +125,11 @@ func (s *PostStore) Update(ctx context.Context, post *Post) error {
 	}
 
 	return nil
+}
+
+func (s *PostStore) GetUserFeed(ctx context.Context, userID int64) ([]*PostWithMetadata, error) {
+	// query := `
+	// 	SELECT * FROM posts
+	// `
+	return nil, nil
 }
