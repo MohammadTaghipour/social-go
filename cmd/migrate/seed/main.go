@@ -6,7 +6,7 @@ import (
 	"github.com/MohammadTaghipour/social/internal/store"
 )
 
-// run using: go run /cmd/migrate/seed/main.go
+// run using: go run cmd/migrate/seed/main.go
 func main() {
 	addr := env.GetString("DB_ADDR", "postgres://admin:adminpassword@localhost/social?sslmode=disable")
 	maxOpenConns := env.GetInt("DB_MAX_OPEN_CONNS", 30)
