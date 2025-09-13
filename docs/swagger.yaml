@@ -15,6 +15,19 @@ definitions:
     - content
     - title
     type: object
+  main.UpdatePostPayload:
+    properties:
+      content:
+        maxLength: 1000
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+      title:
+        maxLength: 100
+        type: string
+    type: object
   store.Comment:
     properties:
       content:
@@ -184,6 +197,41 @@ paths:
           description: Internal Server Error
           schema: {}
       summary: Delete a post
+      tags:
+      - post
+    patch:
+      consumes:
+      - application/json
+      description: Updates fields of an existing post (title, content, tags)
+      parameters:
+      - description: Post ID
+        in: path
+        name: postID
+        required: true
+        type: integer
+      - description: Updated post data
+        in: body
+        name: post
+        required: true
+        schema:
+          $ref: '#/definitions/main.UpdatePostPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/store.Post'
+        "400":
+          description: Invalid request payload
+          schema: {}
+        "404":
+          description: Post not found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Update an existing post
       tags:
       - post
   /post/{postID}/:
