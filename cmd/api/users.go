@@ -15,6 +15,19 @@ type userKey string
 
 const userCtxKey userKey = "user"
 
+// GetUser godoc
+//
+//	@Summary		Fetches a user Profile
+//	@Description	Returns a user's info
+//	@Tags			user
+//	@Accept			json
+//	@Produce		json
+//	@Param			userID	path		int	true	"User ID"
+//	@Success		200		{object}	store.User
+//	@Failure		400		{object}	error
+//	@Failure		500		{object}	error
+//	@Security		ApiKeyAuth
+//	@Router			/user/{userID} [get]
 func (app *application) getUserHandler(w http.ResponseWriter, r *http.Request) {
 	user := getUserFromCtx(r)
 	if err := app.jsonResponse(w, http.StatusOK, user); err != nil {
@@ -22,6 +35,18 @@ func (app *application) getUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// FollowUser godoc
+//
+//	@Summary		Follows a user
+//	@Description	Follows a user by ID
+//	@Tags			user
+//	@Accept			json
+//	@Produce		json
+//	@Param			userID	path	int	true	"User ID"
+//	@Success		204		"User followed"
+//	@Failure		400		{object}	error	"User not found"
+//	@Security		ApiKeyAuth
+//	@Router			/user/{userID}/follow [put]
 func (app *application) followUserHandler(w http.ResponseWriter, r *http.Request) {
 	followerUser := getUserFromCtx(r)
 
@@ -41,6 +66,18 @@ func (app *application) followUserHandler(w http.ResponseWriter, r *http.Request
 	}
 }
 
+// UnfollowUser godoc
+//
+//	@Summary		Unfollows a user
+//	@Description	UnFollows a user by ID
+//	@Tags			user
+//	@Accept			json
+//	@Produce		json
+//	@Param			userID	path	int	true	"User ID"
+//	@Success		204		"User unfollowed"
+//	@Failure		400		{object}	error	"User not found"
+//	@Security		ApiKeyAuth
+//	@Router			/user/{userID}/unfollow [put]
 func (app *application) unfollowUserHandler(w http.ResponseWriter, r *http.Request) {
 	followerUser := getUserFromCtx(r)
 

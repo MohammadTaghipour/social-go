@@ -21,6 +21,18 @@ type CreatePostPayload struct {
 	Tags    []string `json:"tags"`
 }
 
+// createPostHandler godoc
+//
+//	@Summary		Create a new post
+//	@Description	Creates a new post with title, content, and optional tags
+//	@Tags			post
+//	@Accept			json
+//	@Produce		json
+//	@Param			post	body		CreatePostPayload	true	"Post data"
+//	@Success		201		{object}	store.Post
+//	@Failure		400		{object}	error	"Invalid request payload"
+//	@Failure		500		{object}	error	"Internal Server Error"
+//	@Router			/post/create [post]
 func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request) {
 	var payload CreatePostPayload
 
@@ -55,6 +67,18 @@ func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request
 	}
 }
 
+// getPostHandler godoc
+//
+//	@Summary		Get a post
+//	@Description	Returns a single post with metadata and comments
+//	@Tags			post
+//	@Accept			json
+//	@Produce		json
+//	@Param			postID	path		int	true	"Post ID"
+//	@Success		200		{object}	store.Post
+//	@Failure		400		{object}	error	"Bad Request"
+//	@Failure		500		{object}	error	"Internal Server Error"
+//	@Router			/post/{postID}/ [get]
 func (app *application) getPostHandler(w http.ResponseWriter, r *http.Request) {
 	post := getPostFromCtx(r)
 
@@ -75,6 +99,19 @@ func (app *application) getPostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// deletePostHandler godoc
+//
+//	@Summary		Delete a post
+//	@Description	Deletes a post by its ID
+//	@Tags			post
+//	@Accept			json
+//	@Produce		json
+//	@Param			postID	path	int	true	"Post ID"
+//	@Success		204		"No Content"
+//	@Failure		400		{object}	error	"Bad Request"
+//	@Failure		404		{object}	error	"Post Not Found"
+//	@Failure		500		{object}	error	"Internal Server Error"
+//	@Router			/post/{postID} [delete]
 func (app *application) deletePostHandler(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "postID")
 	id, err := strconv.ParseInt(idParam, 10, 64)
@@ -109,6 +146,20 @@ type UpdatePostPayload struct {
 	Tags    *[]string `json:"tags"`
 }
 
+// updatePostHandler godoc
+//
+//	@Summary		Update an existing post
+//	@Description	Updates fields of an existing post (title, content, tags)
+//	@Tags			post
+//	@Accept			json
+//	@Produce		json
+//	@Param			postID	path		int					true	"Post ID"
+//	@Param			post	body		UpdatePostPayload	true	"Updated post data"
+//	@Success		200		{object}	store.Post
+//	@Failure		400		{object}	error	"Invalid request payload"
+//	@Failure		404		{object}	error	"Post not found"
+//	@Failure		500		{object}	error	"Internal Server Error"
+//	@Router			/post/{postID} [patch]
 func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request) {
 	post := getPostFromCtx(r)
 
