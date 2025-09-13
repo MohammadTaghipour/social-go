@@ -8,6 +8,24 @@ import (
 	"github.com/MohammadTaghipour/social/internal/store"
 )
 
+// getUserFeedHandler godoc
+//
+//	@Summary		Get user feed
+//	@Description	Returns paginated posts for a given user (with filters, tags, etc.)
+//	@Tags			feed
+//	@Accept			json
+//	@Produce		json
+//	@Param			limit	query	int			false	"Max items per page"
+//	@Param			offset	query	int			false	"Pagination offset"
+//	@Param			sort	query	string		false	"Sort order (asc or desc)"
+//	@Param			tags	query	[]string	false	"Filter by tags (comma separated)"
+//	@Param			search	query	string		false	"Full-text search in title/content"
+//	@Param			since	query	string		false	"Filter posts created since (RFC3339)"
+//	@Param			until	query	string		false	"Filter posts created until (RFC3339)"
+//	@Success		200		{array}	store.PostWithMetadata
+//	@Failure		400
+//	@Failure		500
+//	@Router			/feed [get]
 func (app *application) getUserFeedHandler(w http.ResponseWriter, r *http.Request) {
 	// default
 	fq := store.PaginatedFeedQuery{

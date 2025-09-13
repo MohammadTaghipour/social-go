@@ -2,8 +2,9 @@ FROM golang:1.25
 
 WORKDIR /app
 
-RUN go install github.com/air-verse/air@latest
-
+RUN go install github.com/air-verse/air@latest \
+    && go install github.com/swaggo/swag/cmd/swag@latest
+    
 COPY go.mod go.sum ./
 RUN go mod download
 
