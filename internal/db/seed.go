@@ -75,8 +75,8 @@ func generateUsers(num int) []*store.User {
 		users[i] = &store.User{
 			Username: usernames[i%len(usernames)] + fmt.Sprintf("%d", i),
 			Email:    usernames[i%len(usernames)] + fmt.Sprintf("%d", i) + "email.com",
-			Password: "123123",
 		}
+		users[i].Password.Set("123123")
 	}
 
 	return users
