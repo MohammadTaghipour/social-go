@@ -4,10 +4,13 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"time"
 )
 
 var (
-	ErrNotFound = errors.New("record not found")
+	ErrNotFound          = errors.New("record not found")
+	ErrDuplicateEmail    = errors.New("email already exists")
+	ErrDuplicateUsername = errors.New("username already exists")
 )
 
 type Storage struct {
@@ -19,8 +22,8 @@ type Storage struct {
 		GetUserFeed(ctx context.Context, userID int64, fq PaginatedFeedQuery) ([]PostWithMetadata, error)
 	}
 	Users interface {
-		Create(ctx context.Context, user *User) error
-		CreateAndInvite(ctx context.Context, user *User, token string) error
+		Create(ctx context.Context, tx *sql.Tx, user *User) error
+		CreateAndInvite(ctx context.Context, user *User, token string, invitationsExpDate time.Duration) error
 		GetByID(ctx context.Context, userID int64) (*User, error)
 	}
 	Comments interface {
@@ -40,4 +43,19 @@ func NewStorage(db *sql.DB) Storage {
 		Comments:  &CommentStore{db: db},
 		Followers: &FollowerStore{db: db},
 	}
+}
+
+// with transaction
+func withTx(db *sql.DB, ctx context.Context, fn func(*sql.Tx) error) error {
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	if err := fn(tx); err != nil {
+		_ = tx.Rollback()
+		return err
+	}
+
+	return tx.Commit()
 }

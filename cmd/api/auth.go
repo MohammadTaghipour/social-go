@@ -2,8 +2,12 @@ package main
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"net/http"
 	"time"
+
+	"github.com/google/uuid"
 
 	"github.com/MohammadTaghipour/social/internal/store"
 )
@@ -48,12 +52,25 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 		app.statusInternalServerError(w, r, err)
 		return
 	}
-
-	// store the user
 	ctx, cancel := context.WithTimeout(r.Context(), time.Second*10)
 	defer cancel()
-	if err := app.store.Users.CreateAndInvite(ctx, user, "uuidv4"); err != nil {
-		app.statusInternalServerError(w, r, err)
+
+	plainToken := uuid.New().String()
+
+	// hash the token for storage but keep the plan token for email
+	hash := sha256.Sum256([]byte(plainToken))
+	hashToken := hex.EncodeToString(hash[:])
+
+	// store the user
+	if err := app.store.Users.CreateAndInvite(ctx, user, hashToken, app.config.mail.exp); err != nil {
+		switch err {
+		case store.ErrDuplicateEmail:
+			app.statusBadRequestError(w, r, err)
+		case store.ErrDuplicateUsername:
+			app.statusBadRequestError(w, r, err)
+		default:
+			app.statusInternalServerError(w, r, err)
+		}
 		return
 	}
 
