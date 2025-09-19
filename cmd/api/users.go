@@ -35,6 +35,46 @@ func (app *application) getUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// ActivateUser godoc
+//
+//	@Summary		Activates/Registers a user
+//	@Description	Activates/Registers a user
+//	@Tags			user
+//	@Accept			json
+//	@Produce		json
+//	@Param			token	path		string	true	"Invitation token"
+//	@Success		204		{string}	string	"User activated"
+//	@Failure		404		{object}	error
+//	@Failure		500		{object}	error
+//	@Security		ApiKeyAuth
+//	@Router			/user/activate/{token} [put]
+func (app *application) activateUserHandler(w http.ResponseWriter, r *http.Request) {
+	token := chi.URLParam(r, "token")
+
+	if token == "" {
+		app.statusBadRequestError(w, r, errors.New("token is required"))
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(r.Context(), time.Second*10)
+	defer cancel()
+
+	if err := app.store.Users.Activate(ctx, token); err != nil {
+		switch err {
+		case store.ErrNotFound:
+			app.statusBadRequestError(w, r, err)
+		default:
+			app.statusInternalServerError(w, r, err)
+		}
+		return
+	}
+
+	if err := app.jsonResponse(w, http.StatusNoContent, nil); err != nil {
+		app.statusInternalServerError(w, r, err)
+	}
+
+}
+
 // FollowUser godoc
 //
 //	@Summary		Follows a user
