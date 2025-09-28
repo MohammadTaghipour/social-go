@@ -5,6 +5,7 @@ import (
 
 	"github.com/MohammadTaghipour/social/internal/db"
 	"github.com/MohammadTaghipour/social/internal/env"
+	"github.com/MohammadTaghipour/social/internal/mailer"
 	"github.com/MohammadTaghipour/social/internal/store"
 	"go.uber.org/zap"
 )
@@ -28,17 +29,22 @@ const version string = "0.0.1"
 // @description
 func main() {
 	cfg := config{
-		addr:   env.GetString("ADDR", ":8080"),
-		apiURL: env.GetString("EXTERNAL_URL", "localhost:8080"),
+		addr:        env.GetString("ADDR", ":8080"),
+		apiURL:      env.GetString("EXTERNAL_URL", "localhost:8080"),
+		frontendURL: env.GetString("FRONTEND_URL", "http://localhost:4000"),
 		db: dbConfig{
 			addr:         env.GetString("DB_ADDR", "postgres://admin:adminpassword@localhost/social?sslmode=disable"),
 			maxOpenConns: env.GetInt("DB_MAX_OPEN_CONNS", 30),
 			maxIdleConns: env.GetInt("DB_MAX_IDLE_CONNS", 30),
 			maxIdleTime:  env.GetString("DB_MAX_IDLE_TIME", "15m"),
-		}, mail: mainConfig{
-			exp: time.Hour * 24 * 3, // 3 days to accept invitations
+		}, mail: mailConfig{
+			mailHog: mailHogConfig{
+				addr: env.GetString("MAILHOG_ADDR", ""),
+			},
+			fromEmail: env.GetString("FROM_EMAIL", ""),
+			exp:       time.Hour * 24 * 3, // 3 days to accept invitations
 		},
-		env: env.GetString("ENV", "development"),
+		env: env.GetString("ENV", "dev"),
 	}
 
 	// Logger
@@ -62,10 +68,13 @@ func main() {
 
 	store := store.NewStorage(db) // TODO: pass a real db connection
 
+	mailer := mailer.NewMailhog(cfg.mail.mailHog.addr, cfg.mail.fromEmail)
+
 	app := &application{
 		config: cfg,
 		store:  store,
 		logger: logger,
+		mailer: mailer,
 	}
 
 	mux := app.mount()

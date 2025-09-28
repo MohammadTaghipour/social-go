@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/MohammadTaghipour/social/docs"
+	"github.com/MohammadTaghipour/social/internal/mailer"
 	"github.com/MohammadTaghipour/social/internal/store"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -17,18 +18,26 @@ type application struct {
 	config config
 	store  store.Storage
 	logger *zap.SugaredLogger
+	mailer mailer.Client
 }
 
 type config struct {
-	addr   string
-	db     dbConfig
-	env    string
-	apiURL string
-	mail   mainConfig
+	addr        string
+	db          dbConfig
+	env         string
+	apiURL      string
+	mail        mailConfig
+	frontendURL string
 }
 
-type mainConfig struct {
-	exp time.Duration
+type mailConfig struct {
+	mailHog   mailHogConfig
+	fromEmail string
+	exp       time.Duration
+}
+
+type mailHogConfig struct {
+	addr string
 }
 
 type dbConfig struct {

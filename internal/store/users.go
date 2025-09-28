@@ -131,6 +131,22 @@ func (s *UserStore) Activate(ctx context.Context, token string) error {
 	})
 }
 
+func (s *UserStore) Delete(ctx context.Context, userID int64) error {
+	return withTx(s.db, ctx, func(tx *sql.Tx) error {
+		// 1. Delete user
+		if err := s.delete(ctx, tx, userID); err != nil {
+			return err
+		}
+
+		// 2. Delete invitation
+		if err := s.deleteUserInvitations(ctx, tx, userID); err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
 func (s *UserStore) getUserFromInvitation(ctx context.Context, tx *sql.Tx, token string) (*User, error) {
 	query := `
 		SELECT u.id, u.email, u.username, u.created_at, u.is_active
@@ -169,6 +185,16 @@ func (s *UserStore) update(ctx context.Context, tx *sql.Tx, user *User) error {
 	`
 
 	_, err := tx.ExecContext(ctx, query, user.Username, user.Email, user.IsActive, user.ID)
+
+	return err
+}
+
+func (s *UserStore) delete(ctx context.Context, tx *sql.Tx, userID int64) error {
+	query := `
+			DELETE FROM users
+			WHERE id = $1;
+		`
+	_, err := tx.ExecContext(ctx, query, userID)
 
 	return err
 }

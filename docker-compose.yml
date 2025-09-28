@@ -16,14 +16,14 @@ services:
 
 
   db:
-    image: postgres:16
+    image: postgres:15
     container_name: social_db
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: adminpassword
       POSTGRES_DB: social
     ports:
-      - "5432:5432"
+      - "9565:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./scripts:/docker-entrypoint-initdb.d
@@ -37,5 +37,13 @@ services:
     depends_on:
       - db
 
+  mailhog:
+    image: mailhog/mailhog
+    container_name: mailhog
+    ports:
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # Web UI
+    restart: unless-stopped
+    
 volumes:
   pgdata:
