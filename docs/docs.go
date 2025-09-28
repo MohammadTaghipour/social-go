@@ -720,6 +720,8 @@ var SwaggerInfo = &swag.Spec{
 	Description:      "API for GopherSocial, a social network for Gophers",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
+	LeftDelim:        "{{",
+	RightDelim:       "}}",
 }
 
 func init() {

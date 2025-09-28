@@ -3,7 +3,10 @@ services:
     build: .
     container_name: social_app
     environment:
+      ENV: "prod"
       DB_ADDR: "postgres://admin:adminpassword@db/social?sslmode=disable"
+      MAILHOG_ADDR: "mailhog:1025"
+      FROM_EMAIL: "gopher@email.com"
     working_dir: /app
     volumes:
       - .:/app
@@ -44,6 +47,6 @@ services:
       - "1025:1025"   # SMTP
       - "8025:8025"   # Web UI
     restart: unless-stopped
-    
+
 volumes:
   pgdata:

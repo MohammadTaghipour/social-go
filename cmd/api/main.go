@@ -39,9 +39,9 @@ func main() {
 			maxIdleTime:  env.GetString("DB_MAX_IDLE_TIME", "15m"),
 		}, mail: mailConfig{
 			mailHog: mailHogConfig{
-				addr: env.GetString("MAILHOG_ADDR", ""),
+				addr: env.GetString("MAILHOG_ADDR", "localhost:1025"),
 			},
-			fromEmail: env.GetString("FROM_EMAIL", ""),
+			fromEmail: env.GetString("FROM_EMAIL", "gopher@email.com"),
 			exp:       time.Hour * 24 * 3, // 3 days to accept invitations
 		},
 		env: env.GetString("ENV", "dev"),
