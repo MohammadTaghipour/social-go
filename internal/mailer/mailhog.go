@@ -3,7 +3,6 @@ package mailer
 import (
 	"bytes"
 	"fmt"
-	"log"
 	"net/smtp"
 	"text/template"
 	"time"
@@ -57,19 +56,16 @@ func (m *MailHogMailer) Send(templateFile, username, email string, data any, isS
 	}
 
 	// send
+	var retryError error
 	for i := 0; i < maxRetries; i++ {
-		err := smtp.SendMail(m.addr, nil, m.fromEmail, []string{email}, msg)
-		if err != nil {
-			log.Printf("failed to send email to %s, attempt %d of %d", email, i+1, maxRetries)
-			log.Printf("error: %v", err)
+		retryError := smtp.SendMail(m.addr, nil, m.fromEmail, []string{email}, msg)
+		if retryError != nil {
 			time.Sleep(time.Second * time.Duration(i+1))
 			continue
 		}
-
-		log.Printf("email sent successfuly")
 		return nil
 	}
 
-	return fmt.Errorf("failed to send email after %d attempts", maxRetries)
+	return fmt.Errorf("failed to send email after %d attempts, error: %v", maxRetries, retryError)
 
 }
