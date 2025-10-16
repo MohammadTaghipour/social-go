@@ -44,6 +44,12 @@ func main() {
 			fromEmail: env.GetString("FROM_EMAIL", "gopher@email.com"),
 			exp:       time.Hour * 24 * 3, // 3 days to accept invitations
 		},
+		auth: authConfig{
+			basic: basicConfig{
+				user: env.GetString("AUTH_BASIC_USER", "admin"),
+				pass: env.GetString("AUTH_BASIC_PASS", "admin"),
+			},
+		},
 		env: env.GetString("ENV", "dev"),
 	}
 
