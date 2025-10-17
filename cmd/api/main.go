@@ -3,6 +3,7 @@ package main
 import (
 	"time"
 
+	"github.com/MohammadTaghipour/social/internal/auth"
 	"github.com/MohammadTaghipour/social/internal/db"
 	"github.com/MohammadTaghipour/social/internal/env"
 	"github.com/MohammadTaghipour/social/internal/mailer"
@@ -49,6 +50,12 @@ func main() {
 				user: env.GetString("AUTH_BASIC_USER", "admin"),
 				pass: env.GetString("AUTH_BASIC_PASS", "admin"),
 			},
+			jwt: jwtConfig{
+				secret: env.GetString("AUTH_JWT_SECRET", "supersecretkey"),
+				issuer: env.GetString("AUTH_JWT_ISSUER", "gophersocial"),
+				expiration: time.Duration(
+					env.GetInt("AUTH_JWT_EXPIRATION_HOURS", 72)) * time.Hour,
+			},
 		},
 		env: env.GetString("ENV", "dev"),
 	}
@@ -76,11 +83,18 @@ func main() {
 
 	mailer := mailer.NewMailhog(cfg.mail.mailHog.addr, cfg.mail.fromEmail)
 
+	jwtAuthenticator := auth.NewJwtAuthenticator(
+		cfg.auth.jwt.secret,
+		cfg.auth.jwt.issuer,
+		cfg.auth.jwt.issuer,
+	)
+
 	app := &application{
-		config: cfg,
-		store:  store,
-		logger: logger,
-		mailer: mailer,
+		config:        cfg,
+		store:         store,
+		logger:        logger,
+		mailer:        mailer,
+		authenticator: jwtAuthenticator,
 	}
 
 	mux := app.mount()
