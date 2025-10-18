@@ -503,6 +503,7 @@ paths:
       - user
 securityDefinitions:
   ApiKeyAuth:
+    description: Type "Bearer" followed by a space and your JWT token.
     in: header
     name: Authorization
     type: apiKey

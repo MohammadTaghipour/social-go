@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -25,7 +26,7 @@ import (
 //	@Success		200		{array}	store.PostWithMetadata
 //	@Failure		400
 //	@Failure		500
-//	@Router			/feed [get]
+//	@Router			/user/feed [get]
 func (app *application) getUserFeedHandler(w http.ResponseWriter, r *http.Request) {
 	// default
 	fq := store.PaginatedFeedQuery{
@@ -53,7 +54,13 @@ func (app *application) getUserFeedHandler(w http.ResponseWriter, r *http.Reques
 	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
 	defer cancel()
 
-	feed, err := app.store.Posts.GetUserFeed(ctx, int64(1), fq) // TODO: get userID from auth
+	user := getUserFromCtx(r)
+	if user == nil {
+		app.statusInternalServerError(w, r, fmt.Errorf("user not found"))
+		return
+	}
+
+	feed, err := app.store.Posts.GetUserFeed(ctx, user.ID, fq)
 	if err != nil {
 		app.statusInternalServerError(w, r, err)
 		return

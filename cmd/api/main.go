@@ -27,7 +27,7 @@ const version string = "0.0.1"
 // @securityDefinitions.apikey	ApiKeyAuth
 // @in							header
 // @name						Authorization
-// @description
+// @description				Type "Bearer" followed by a space and your JWT token.
 func main() {
 	cfg := config{
 		addr:        env.GetString("ADDR", ":8080"),

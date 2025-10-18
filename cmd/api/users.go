@@ -89,14 +89,16 @@ func (app *application) activateUserHandler(w http.ResponseWriter, r *http.Reque
 //	@Router			/user/{userID}/follow [put]
 func (app *application) followUserHandler(w http.ResponseWriter, r *http.Request) {
 	followerUser := getUserFromCtx(r)
-
-	// TODO: change this after auth
-	var userID int64 = 1
+	followedID, err := strconv.ParseInt(chi.URLParam(r, "userID"), 10, 64)
+	if err != nil {
+		app.statusInternalServerError(w, r, err)
+		return
+	}
 
 	ctx, cancel := context.WithTimeout(r.Context(), time.Second*5)
 	defer cancel()
 
-	if err := app.store.Followers.Follow(ctx, followerUser.ID, userID); err != nil {
+	if err := app.store.Followers.Follow(ctx, followerUser.ID, followedID); err != nil {
 		app.statusInternalServerError(w, r, err)
 
 	}
@@ -120,14 +122,16 @@ func (app *application) followUserHandler(w http.ResponseWriter, r *http.Request
 //	@Router			/user/{userID}/unfollow [put]
 func (app *application) unfollowUserHandler(w http.ResponseWriter, r *http.Request) {
 	followerUser := getUserFromCtx(r)
-
-	// TODO: change this after auth
-	var userID int64 = 1
+	followedID, err := strconv.ParseInt(chi.URLParam(r, "userID"), 10, 64)
+	if err != nil {
+		app.statusInternalServerError(w, r, err)
+		return
+	}
 
 	ctx, cancel := context.WithTimeout(r.Context(), time.Second*5)
 	defer cancel()
 
-	if err := app.store.Followers.UnFollow(ctx, followerUser.ID, userID); err != nil {
+	if err := app.store.Followers.UnFollow(ctx, followerUser.ID, followedID); err != nil {
 		app.statusInternalServerError(w, r, err)
 
 	}

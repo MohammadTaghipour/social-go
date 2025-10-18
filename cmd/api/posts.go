@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -46,10 +47,16 @@ func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	user := getUserFromCtx(r)
+	if user == nil {
+		app.statusInternalServerError(w, r, fmt.Errorf("user not found"))
+		return
+	}
+
 	post := store.Post{
 		Title:   payload.Title,
 		Content: payload.Content,
-		UserID:  1, // TODO: change after auth
+		UserID:  user.ID,
 		Tags:    payload.Tags,
 	}
 

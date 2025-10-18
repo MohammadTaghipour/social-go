@@ -90,7 +90,7 @@ func (s *UserStore) createUserInvitation(ctx context.Context, tx *sql.Tx, token 
 
 func (s *UserStore) GetByID(ctx context.Context, userID int64) (*User, error) {
 	query := `
-		SELECT id, username, email, created_at
+		SELECT id, username, email, password, created_at
 		FROM users
 		WHERE id = $1 AND is_active = true
 	`
@@ -99,6 +99,7 @@ func (s *UserStore) GetByID(ctx context.Context, userID int64) (*User, error) {
 		&user.ID,
 		&user.Username,
 		&user.Email,
+		&user.Password.hash,
 		&user.CreatedAt,
 	); err != nil {
 		switch {
