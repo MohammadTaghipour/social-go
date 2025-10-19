@@ -206,59 +206,6 @@ paths:
       summary: Registers a user
       tags:
       - authentication
-  /feed:
-    get:
-      consumes:
-      - application/json
-      description: Returns paginated posts for a given user (with filters, tags, etc.)
-      parameters:
-      - description: Max items per page
-        in: query
-        name: limit
-        type: integer
-      - description: Pagination offset
-        in: query
-        name: offset
-        type: integer
-      - description: Sort order (asc or desc)
-        in: query
-        name: sort
-        type: string
-      - collectionFormat: csv
-        description: Filter by tags (comma separated)
-        in: query
-        items:
-          type: string
-        name: tags
-        type: array
-      - description: Full-text search in title/content
-        in: query
-        name: search
-        type: string
-      - description: Filter posts created since (RFC3339)
-        in: query
-        name: since
-        type: string
-      - description: Filter posts created until (RFC3339)
-        in: query
-        name: until
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/store.PostWithMetadata'
-            type: array
-        "400":
-          description: Bad Request
-        "500":
-          description: Internal Server Error
-      summary: Get user feed
-      tags:
-      - feed
   /health:
     get:
       consumes:
@@ -501,6 +448,59 @@ paths:
       summary: Activates/Registers a user
       tags:
       - user
+  /user/feed:
+    get:
+      consumes:
+      - application/json
+      description: Returns paginated posts for a given user (with filters, tags, etc.)
+      parameters:
+      - description: Max items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Pagination offset
+        in: query
+        name: offset
+        type: integer
+      - description: Sort order (asc or desc)
+        in: query
+        name: sort
+        type: string
+      - collectionFormat: csv
+        description: Filter by tags (comma separated)
+        in: query
+        items:
+          type: string
+        name: tags
+        type: array
+      - description: Full-text search in title/content
+        in: query
+        name: search
+        type: string
+      - description: Filter posts created since (RFC3339)
+        in: query
+        name: since
+        type: string
+      - description: Filter posts created until (RFC3339)
+        in: query
+        name: until
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/store.PostWithMetadata'
+            type: array
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Get user feed
+      tags:
+      - feed
 securityDefinitions:
   ApiKeyAuth:
     description: Type "Bearer" followed by a space and your JWT token.

@@ -97,6 +97,7 @@ func (app *application) mount() http.Handler {
 		// feature Posts
 		r.Route("/post", func(r chi.Router) {
 			r.Use(app.JwtAuthMiddleware())
+
 			r.Post("/create", app.createPostHandler)
 
 			r.Route("/{postID}", func(r chi.Router) {
@@ -114,6 +115,7 @@ func (app *application) mount() http.Handler {
 
 			r.Route("/{userID}", func(r chi.Router) {
 				r.Use(app.JwtAuthMiddleware())
+
 				r.Get("/", app.getUserHandler)
 				r.Put("/follow", app.followUserHandler)
 				r.Put("/unfollow", app.unfollowUserHandler)
@@ -121,6 +123,7 @@ func (app *application) mount() http.Handler {
 
 			r.Group(func(r chi.Router) {
 				r.Use(app.JwtAuthMiddleware())
+
 				r.Get("/feed", app.getUserFeedHandler)
 			})
 
