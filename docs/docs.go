@@ -664,6 +664,9 @@ const docTemplate = `{
                 "role": {
                     "$ref": "#/definitions/store.Role"
                 },
+                "role_id": {
+                    "type": "integer"
+                },
                 "token": {
                     "type": "string"
                 },
@@ -781,6 +784,9 @@ const docTemplate = `{
                 },
                 "role": {
                     "$ref": "#/definitions/store.Role"
+                },
+                "role_id": {
+                    "type": "integer"
                 },
                 "username": {
                     "type": "string"

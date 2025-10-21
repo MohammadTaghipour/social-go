@@ -8,6 +8,8 @@ import (
 	"github.com/MohammadTaghipour/social/internal/env"
 	"github.com/MohammadTaghipour/social/internal/mailer"
 	"github.com/MohammadTaghipour/social/internal/store"
+	"github.com/MohammadTaghipour/social/internal/store/cache"
+	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 )
 
@@ -38,7 +40,14 @@ func main() {
 			maxOpenConns: env.GetInt("DB_MAX_OPEN_CONNS", 30),
 			maxIdleConns: env.GetInt("DB_MAX_IDLE_CONNS", 30),
 			maxIdleTime:  env.GetString("DB_MAX_IDLE_TIME", "15m"),
-		}, mail: mailConfig{
+		},
+		redis: redisConfig{
+			addr:     env.GetString("REDIS_ADDR", "localhost:6379"),
+			password: env.GetString("REDIS_PASSWROD", ""),
+			db:       env.GetInt("REDIS_DB", 0),
+			enabled:  env.GetBool("REDIS_ENABLED", false),
+		},
+		mail: mailConfig{
 			mailHog: mailHogConfig{
 				addr: env.GetString("MAILHOG_ADDR", "localhost:1025"),
 			},
@@ -79,6 +88,14 @@ func main() {
 	defer db.Close()
 	logger.Info("database connection pool established")
 
+	// cache
+	var rdb *redis.Client
+	if cfg.redis.enabled {
+		rdb = cache.NewRedisClient(cfg.redis.addr, cfg.redis.password, cfg.redis.db)
+		logger.Info("redis cache connection established")
+	}
+
+	cacheStore := cache.NewStorage(rdb)
 	store := store.NewStorage(db) // TODO: pass a real db connection
 
 	mailer := mailer.NewMailhog(cfg.mail.mailHog.addr, cfg.mail.fromEmail)
@@ -95,6 +112,7 @@ func main() {
 		logger:        logger,
 		mailer:        mailer,
 		authenticator: jwtAuthenticator,
+		cache:         cacheStore,
 	}
 
 	mux := app.mount()
