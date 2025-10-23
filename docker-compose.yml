@@ -6,6 +6,7 @@ services:
       ENV: "prod"
       DB_ADDR: "postgres://admin:adminpassword@db/social?sslmode=disable"
       MAILHOG_ADDR: "mailhog:1025"
+      REDIS_ADDR: "redis:6379"
       FROM_EMAIL: "gopher@email.com"
     working_dir: /app
     volumes:
