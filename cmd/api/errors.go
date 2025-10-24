@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 )
 
@@ -47,4 +48,8 @@ func (app *application) unauthorizedJwtError(w http.ResponseWriter, r *http.Requ
 func (app *application) statusForbiddenError(w http.ResponseWriter, r *http.Request) {
 	app.logger.Warnw("forbidden error", "method", r.Method, "path", r.URL.Path)
 	writeJSONError(w, http.StatusForbidden, "Forbidden")
+}
+
+func (app *application) rateLimitExceededResponse(w http.ResponseWriter, r *http.Request, time string) {
+	writeJSONError(w, http.StatusTooManyRequests, fmt.Sprintf("Too many requests. wait for %s", time))
 }

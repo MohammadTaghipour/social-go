@@ -13,6 +13,7 @@ import (
 	"github.com/MohammadTaghipour/social/docs"
 	"github.com/MohammadTaghipour/social/internal/auth"
 	"github.com/MohammadTaghipour/social/internal/mailer"
+	"github.com/MohammadTaghipour/social/internal/ratelimiter"
 	"github.com/MohammadTaghipour/social/internal/store"
 	"github.com/MohammadTaghipour/social/internal/store/cache"
 	"github.com/go-chi/chi/v5"
@@ -29,6 +30,7 @@ type application struct {
 	logger        *zap.SugaredLogger
 	mailer        mailer.Client
 	authenticator auth.Authenticator
+	ratelimiter   ratelimiter.Limiter
 }
 
 type config struct {
@@ -40,6 +42,7 @@ type config struct {
 	mail        mailConfig
 	auth        authConfig
 	frontendURL string
+	ratelimiter ratelimiter.Config
 }
 
 type mailConfig struct {
@@ -102,6 +105,7 @@ func (app *application) mount() http.Handler {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Timeout(60 * time.Second))
+	r.Use(app.RateLimiterMiddleware())
 
 	r.Route("/v1", func(r chi.Router) {
 		r.With(app.BasicAuthMiddleware()).Get("/health", app.healthCheckHandler)

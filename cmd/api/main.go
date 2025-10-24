@@ -7,6 +7,7 @@ import (
 	"github.com/MohammadTaghipour/social/internal/db"
 	"github.com/MohammadTaghipour/social/internal/env"
 	"github.com/MohammadTaghipour/social/internal/mailer"
+	"github.com/MohammadTaghipour/social/internal/ratelimiter"
 	"github.com/MohammadTaghipour/social/internal/store"
 	"github.com/MohammadTaghipour/social/internal/store/cache"
 	"github.com/redis/go-redis/v9"
@@ -66,7 +67,11 @@ func main() {
 					env.GetInt("AUTH_JWT_EXPIRATION_HOURS", 72)) * time.Hour,
 			},
 		},
-		env: env.GetString("ENV", "dev"),
+		env: env.GetString("ENV", "dev"), ratelimiter: ratelimiter.Config{
+			ReuestsPerTimeFrame: env.GetInt("RATE_LIMITER_REQUESTS_COUNT", 20),
+			TimeFrame:           time.Second * 5,
+			Enabled:             env.GetBool("RATE_LIMITER_ENABLED", true),
+		},
 	}
 
 	// Logger
@@ -95,6 +100,12 @@ func main() {
 		logger.Info("redis cache connection established")
 	}
 
+	// Rate limiter
+	ratelimiter := ratelimiter.NewFixedWindowLimiter(
+		cfg.ratelimiter.ReuestsPerTimeFrame,
+		cfg.ratelimiter.TimeFrame,
+	)
+
 	cacheStore := cache.NewStorage(rdb)
 	store := store.NewStorage(db) // TODO: pass a real db connection
 
@@ -113,6 +124,7 @@ func main() {
 		mailer:        mailer,
 		authenticator: jwtAuthenticator,
 		cache:         cacheStore,
+		ratelimiter:   ratelimiter,
 	}
 
 	mux := app.mount()
