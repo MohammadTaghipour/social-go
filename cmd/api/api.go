@@ -105,7 +105,7 @@ func (app *application) mount() http.Handler {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Timeout(60 * time.Second))
-	r.Use(app.RateLimiterMiddleware())
+	r.Use(app.RateLimiterMiddleware)
 
 	r.Route("/v1", func(r chi.Router) {
 		r.With(app.BasicAuthMiddleware()).Get("/health", app.healthCheckHandler)

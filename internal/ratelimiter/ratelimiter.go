@@ -11,7 +11,3 @@ type Config struct {
 	TimeFrame           time.Duration
 	Enabled             bool
 }
-
-func NewFixedWindowLimiter(rpf int, tf time.Duration) Limiter {
-	return &FixedWindowLimiter{cfg: cfg}
-}

@@ -101,7 +101,7 @@ func main() {
 	}
 
 	// Rate limiter
-	ratelimiter := ratelimiter.NewFixedWindowLimiter(
+	ratelimiter := ratelimiter.NewFixedWindowRateLimiter(
 		cfg.ratelimiter.ReuestsPerTimeFrame,
 		cfg.ratelimiter.TimeFrame,
 	)
