@@ -12,6 +12,7 @@ import (
 
 	"github.com/MohammadTaghipour/social/docs"
 	"github.com/MohammadTaghipour/social/internal/auth"
+	"github.com/MohammadTaghipour/social/internal/env"
 	"github.com/MohammadTaghipour/social/internal/mailer"
 	"github.com/MohammadTaghipour/social/internal/ratelimiter"
 	"github.com/MohammadTaghipour/social/internal/store"
@@ -103,6 +104,16 @@ func (app *application) mount() http.Handler {
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
+	// must be upper than rate limiter
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins: []string{env.GetString("CORS_ALLOWED_ORIGIN", "http://localhost:5678")}, // Use this to allow specific origin hosts
+		// AllowedOrigins: []string{"https://*", "http://*"}, // for development
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: false,
+		MaxAge:           300, // Maximum value not ignored by any of major browsers
+	}))
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Timeout(60 * time.Second))
 	r.Use(app.RateLimiterMiddleware)
