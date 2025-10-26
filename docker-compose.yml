@@ -6,7 +6,7 @@ services:
       ENV: "prod"
       DB_ADDR: "postgres://admin:adminpassword@db/social?sslmode=disable"
       MAILHOG_ADDR: "mailhog:1025"
-      REDIS_ADDR: "redis:6379"
+      REDIS_ADDR: "redis:5789"
       FROM_EMAIL: "gopher@email.com"
     working_dir: /app
     volumes:
@@ -20,7 +20,7 @@ services:
 
 
   db:
-    image: postgres:16
+    image: postgres:15
     container_name: social_db
     environment:
       POSTGRES_USER: admin
@@ -36,7 +36,7 @@ services:
   redis:
     image: redis:6.2-alpine
     ports:
-      - "6379:6379"
+      - "5789:6379"
     restart: unless-stopped
     command: redis-server --save 60 1 --loglevel warning
 
