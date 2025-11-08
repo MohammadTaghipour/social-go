@@ -1,4 +1,4 @@
-name: Update Version and Release
+name: Release and Update Version
 on:
   push:
     branches:
@@ -6,13 +6,24 @@ on:
 
 permissions:
   contents: write
+  issues: write
+  pull-requests: write
 
 jobs:
-  update-version:
+  release-and-update:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
+      # Step 1: Run release-please to create/update CHANGELOG and tag
+      - name: Run release-please
+        id: release
+        uses: googleapis/release-please-action@v4
+        with:
+          token: ${{ secrets.MY_RELEASE_PLEASE_TOKEN }}
+          release-type: simple
+
+      # Step 2: Extract new version from CHANGELOG.md
       - name: Extract latest version from CHANGELOG.md
         id: get_version
         run: |
@@ -20,6 +31,7 @@ jobs:
           echo "Latest version found: $VERSION"
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
 
+      # Step 3: Update version in main.go
       - name: Update version in cmd/api/main.go
         run: |
           echo "Updating version in main.go..."
@@ -27,14 +39,14 @@ jobs:
           echo "Updated content:"
           grep "const version string" cmd/api/main.go || echo "No match found"
 
-      - name: Commit and push if changed
+      # Step 4: Commit and push version update if changed
+      - name: Commit version update
         run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
           git add cmd/api/main.go
           if ! git diff --cached --quiet; then
-            git commit -m "Update version to ${{ steps.get_version.outputs.VERSION }}"
+            git commit -m "chore: update main.go version to ${{ steps.get_version.outputs.VERSION }}"
             git push
           else
             echo "No changes to commit"
-          fi
