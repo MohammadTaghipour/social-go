@@ -1,4 +1,4 @@
-name: Update Version and release
+name: Update Version and Release
 on:
   push:
     branches:
@@ -17,16 +17,24 @@ jobs:
         id: get_version
         run: |
           VERSION=$(grep -oP '\[\K[0-9]+\.[0-9]+\.[0-9]+' CHANGELOG.md | head -1)
-          echo "::set-output name=VERSION::$VERSION"
+          echo "Latest version found: $VERSION"
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Update version in cmd/api/main.go
         run: |
-          sed -i "s/const version = \".*\"/const version = \"${{ steps.get_version.outputs.VERSION }}\"/" cmd/api/main.go
+          echo "Updating version in main.go..."
+          sed -i "s/const version string = \".*\"/const version string = \"${{ steps.get_version.outputs.VERSION }}\"/" cmd/api/main.go
+          echo "Updated content:"
+          grep "const version string" cmd/api/main.go || echo "No match found"
 
       - name: Commit and push if changed
         run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
           git add cmd/api/main.go
-          git commit -m "Update version to ${{ steps.get_version.outputs.VERSION }}" || echo "No changes to commit"
-          git push
+          # commit only if there are changes
+          if ! git diff --cached --quiet; then
+            git commit -m "Update version to ${{ steps.get_version.outputs.VERSION }}"
+            git push
+          else
+            echo "No changes to commit"
